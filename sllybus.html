@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Syllabus</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{font-family:Arial;background:#f4f6f8}
+.box{
+  max-width:500px;
+  margin:40px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+}
+select,button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+}
+button{
+  background:#004aad;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>📘 Syllabus Check</h2>
+
+  <select id="course">
+    <option value="">Select Course</option>
+    <option value="anm">A.N.M</option>
+    <option value="btech">B.Tech</option>
+    <option value="bba">BBA</option>
+    <option value="bca">BCA</option>
+  </select>
+
+  <button onclick="openSyllabus()">Open PDF</button>
+</div>
+
+<script>
+function openSyllabus(){
+
+  const course = document.getElementById("course").value;
+
+  if(course===""){
+    alert("Please select course");
+    return;
+  }
+
+  // 👇 course wise syllabus PDF mapping
+  let pdf = "";
+
+  if(course==="anm"){
+    pdf = "pdf/anm.pdf";
+  }
+  else if(course==="btech"){
+    pdf = "pdf/btech.pdf";
+  }
+  else if(course==="bba"){
+    pdf = "pdf/bba.pdf";
+  }
+  else if(course==="bca"){
+    pdf = "pdf/bca.pdf";
+  }
+
+  window.open(pdf,"_blank");
+}
+</script>
+
+</body>
+</html>

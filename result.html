@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>University Result</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  font-family:Arial;
+  background:#f4f6f8;
+}
+.result-box{
+  max-width:400px;
+  margin:40px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+  box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+h2{
+  text-align:center;
+  color:#004aad;
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+ box-sizing:border-box;
+}
+button{
+  background:#004aad;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+table,th,td{
+  border:1px solid #ccc;
+}
+th,td{
+  padding:8px;
+  text-align:center;
+}
+.pass{color:green;font-weight:bold}
+.fail{color:red;font-weight:bold}
+#printBtn{
+  background:#0a8d48;
+  margin-top:15px;
+}
+.hidden{display:none}
+.err{
+  color:red;
+  font-size:13px;
+  margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="result-box">
+<h2>University Examination Result</h2>
+
+<input id="roll" placeholder="Enter Roll / Registration Number">
+<input type="date" id="dob">
+
+<button onclick="checkResult()">Check Result</button>
+<div id="err" class="err"></div>
+
+<div id="resultArea" class="hidden">
+<hr>
+
+<p><b>Name:</b> <span id="r_name"></span></p>
+<p><b>Course:</b> <span id="r_course"></span></p>
+<p><b>Year/Semester:</b> <span id="r_year"></span></p>
+
+<table>
+<tr>
+  <th>Subject</th>
+  <th>Marks</th>
+</tr>
+<tr><td>Subject 1</td><td>65</td></tr>
+<tr><td>Subject 2</td><td>72</td></tr>
+<tr><td>Subject 3</td><td>58</td></tr>
+<tr><td>Subject 4</td><td>80</td></tr>
+<tr><td>Subject 5</td><td>69</td></tr>
+</table>
+
+<p><b>Total:</b> 344 / 500</p>
+<p><b>Percentage:</b> 68.8%</p>
+<p><b>Result:</b> <span class="pass">PASS</span></p>
+
+<button id="printBtn" onclick="window.print()">Print Result</button>
+</div>
+</div>
+
+<script>
+function checkResult(){
+  const roll = document.getElementById("roll").value.trim();
+  const dob  = document.getElementById("dob").value;
+  const err  = document.getElementById("err");
+
+  err.innerText = "";
+
+  if(!roll || !dob){
+    err.innerText = "Please enter Roll Number and Date of Birth";
+    return;
+  }
+
+  /* 🔒 DEMO DATA (Frontend only) */
+  const demoRoll = "FSU12345";
+  const demoDob  = "2002-08-15";
+
+  if(roll !== demoRoll || dob !== demoDob){
+    err.innerText = "Invalid Roll Number or Date of Birth";
+    return;
+  }
+
+  // Show Result
+  document.getElementById("r_name").innerText   = "Ajay Kumar";
+  document.getElementById("r_course").innerText = "B.Tech";
+  document.getElementById("r_year").innerText   = "1st Year";
+
+  document.getElementById("resultArea").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+

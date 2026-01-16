@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FS University</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+/* Reset & Base */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+
+body {
+  color: #000;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Background blur */
+body::before {
+    content:"";
+    position:fixed;
+    inset:0;
+    background:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdHTfEPYQdti1yzZ8XHhbqbn4SIbZo4o7OMA&s') center/cover no-repeat;
+    filter:blur(5px);
+    z-index:-1;
+}
+
+/* HEADER */
+header {
+    background:#0f172a;
+    color:#fff;
+    padding:12px 5%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.logo { display:flex; align-items:center; gap:10px; }
+.logo img { height:44px; border-radius: 4px; }
+
+/* NAVIGATION */
+nav { display:flex; gap:18px; }
+nav a { color:#fff; text-decoration:none; font-weight:500; font-size: 14px; transition: 0.3s; }
+nav a:hover { color:#38bdf8; }
+
+.menu-btn { display:none; font-size:26px; cursor:pointer; }
+
+/* HERO SLIDER */
+.hero-slider {
+    position:relative;
+    width:100%;
+    height:90vh; 
+    overflow:hidden;
+    background: #000;
+}
+.hero-slide {
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 1s ease-in-out;
+}
+.hero-slide img { width:100%; height:100%; object-fit:cover; }
+.hero-slide.active { opacity:1; }
+
+.hero-content {
+    position:absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index:10;
+    width:85%;
+    color:#f36608;
+    text-align:center;
+    
+    padding: 20px;
+    border-radius: 10px;
+}
+.hero-content h2 { font-size: clamp(24px, 5vw, 42px); font-weight:800; }
+/* About us aur Courses heading ko attractive banane ke liye */
+#About-us h2, #courses h1 {
+  background-color: #db1c03;
+    text-align: center;         /* Center mein karne ke liye */
+    font-size: 3rem;            /* Bada dikhne ke liye */
+    font-weight: 800;           /* Bold look ke liye */
+    color: #eaecf1;             /* Dark blue color */
+    margin-top: 40px;           /* Upar se gap */
+    margin-bottom: 0%;        /* Neeche se gap */
+    text-transform: uppercase;  /* Saare letters bade karne ke liye */
+    letter-spacing: 1px;        /* Letters ke beech gap */
+    position: relative;
+    padding-bottom: 10px;
+}
+
+/* Heading ke neeche ek sundar line add karne ke liye */
+#About-us h2::after, #courses h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20%;                /* Line ki lambai */
+    height: 4px;                /* Line ki motai */
+    background: #e98707;        /* Orange color ki line */
+    border-radius: 2px;
+}
+/* SECTION STYLING (The Stability Fix) */
+.section-paragraph {
+    display:flex;
+    gap:40px;
+    padding: 50px 8%;
+    align-items:center;
+    background: rgba(255,255,255,0.9);
+    margin: 20px 0;
+}
+
+/* Desktop Images */
+.section-paragraph img {
+    width: 40%; /* Responsive width */
+    max-width: 500px;
+    height: auto;
+    border-radius:12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.section-paragraph .text { width: 60%; }
+.section-paragraph:nth-child(even) { flex-direction:row-reverse; }
+
+.apply-btn {
+    display:inline-block;
+    margin-top:15px;
+    padding:10px 25px;
+    background:#e98707;
+    color:#fff;
+    text-decoration:none;
+    border-radius:8px;
+    font-weight:600;
+}
+
+/* 📱 MOBILE OPTIMIZATION (Important) */
+@media(max-width:768px) {
+    .menu-btn { display:block; }
+    
+    nav {
+        position:absolute;
+        top: 100%; right:0;
+        background:#0f172a;
+        flex-direction:column;
+        width:100%;
+        padding:20px;
+        display:none; 
+        text-align: center;
+        border-top: 1px solid #1e293b;
+    }
+    nav.show { display:flex; }
+
+    .section-paragraph {
+        flex-direction:column !important; /* Stack image on top of text */
+        padding: 30px 20px;
+        text-align: center;
+    }
+    
+    .section-paragraph img, 
+    .section-paragraph .text {
+        width: 100% !important; /* Take full width on mobile */
+        height: auto !important;
+    }
+
+    .hero-slider { height:45vh; }
+    .hero-content h2 { font-size: 26px; }
+
+
+  }
+
+
+
+
+/* CONTACT BOX SECTION */
+.contact-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  padding: 50px 8%;
+  background: rgba(8, 8, 8, 0.95);
+}
+
+.contact-box {
+  background: #ffffff;
+  padding: 30px 20px;
+  text-align: center;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-box:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.25);
+}
+
+.contact-box i {
+  font-size: 34px;
+  color: #e98707;
+  margin-bottom: 12px;
+}
+
+.contact-box h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+
+.contact-box p {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.6;
+}
+/* 📱 Mobile Responsive */
+@media(max-width:768px) {
+  .contact-section {
+    grid-template-columns: 1fr;
+    padding: 30px 20px;
+  }
+}
+
+
+footer { text-align:center; padding:25px; background:#020617; color:#94a3b8; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <img src="https://assets.zollege.in/public/college_data/images/logos/1656318814logo.jpg">
+    <strong>FS University</strong>
+  </div>
+
+  <!-- ☰ BUTTON -->
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+  <nav id="navMenu">
+    <a href="#Home">Home</a>
+    <a href="#About-us">About</a>
+    <a href="#courses">Courses</a>
+    <a href="admission form.html">Admission</a>
+    <a href="result.html">Result</a>
+    <a href="login.html">Login</a>
+    <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
+
+  </nav>
+</header>
+
+<section id="Home">
+
+<div class="hero-slider">
+
+  <div class="hero-slide active">
+    <img src="https://fsu.edu.in/wp-content/uploads/2025/05/IMGL9269.jpg" alt="Slide 1">
+  </div>
+
+  <div class="hero-slide">
+    <img src="https://fsu.edu.in/wp-content/uploads/2025/03/fs1.jpg" alt="Slide 2">
+  </div>
+
+  <div class="hero-slide">
+    <img src="https://image-static.collegedunia.com/public/college_data/images/campusimage/1703582360408034588_409828728056034_4694452873503126887_n.jpg" alt="Slide 3">
+  </div>
+
+<div class="hero-slide">
+<img src="https://images.shiksha.com/mediadata/images/1703140322phplokPHx.jpeg" alt=" Slide 4">
+</div>
+
+<div class="hero-slide">
+<img src="https://images.shiksha.com/mediadata/images/1702915676phpzWGCzT.jpeg" alt="Slide 5">
+</div>
+
+<div class="hero-slide">
+<img src="https://fsu.edu.in/wp-content/uploads/2025/05/IMGL9637.jpg" alt="Slide 6">
+</div>
+
+<div class="hero-slide">
+<img src="https://fsu.edu.in/wp-content/uploads/2025/05/IMGL9637.jpg" alt="Slide 7">
+</div>
+
+</div>
+</section>
+<section id="About-us">
+<section class="top-section">
+<h2>About us</h2>
+
+  <!-- MESSAGE CONTENT -->
+  <section class="section-paragraph">
+   <img src="https://fsu.edu.in/wp-content/uploads/2024/12/Fulan-Singh-Ji-FS-University.png">
+  <div class="text">
+    
+    <h1>A Tribute to a Visionary Leader</h1>
+  
+     <p><strong>The Fraternity of FS University pays tribute to our esteemed patron, Late (Shri) Fulan Singh Ji, whose values and
+       ideals continue to inspire us. His unwavering belief in the power of education has shaped the foundation of our
+        institution, and his legacy lives on in every student who walks through the gates of FS University.
+        In 2004, Dr. Dilip Yadav set out to fulfill the vision of his beloved father, Late (Shri) Fulan Singh, by establishing
+        institutions dedicated to providing quality education to society and beyond. FS University stands as a tribute to his
+        legacy, initiated under the Fulan Singh Jan Kalyan Trust, with the mission of making Shikohabad, Uttar Pradesh, a
+        recognized hub for knowledge seekers from all walks of life. The FS University fraternity proudly honors and pays tribute to our
+        esteemed visionary patron, Late (Shri) Fulan Singh Ji.
+      </strong></p>
+  </div>
+</section>
+
+
+<section class="section-paragraph">
+  <img src="https://fsu.edu.in/wp-content/uploads/2025/03/Dilip-Yadav-FS-University-Shikohabad.jpg"style="width:450px; height:400px; ">
+  <div class="text">
+    <h1>
+Chancellor’s Message </h1>
+    <p><strong><i>Welcome to FS University. Our mission is to provide students with high-quality, practical, and 
+      value-based education that equips them for success in both academic and professional pursuits. At FS University,
+      we believe that education is not limited to acquiring knowledge; it is also a powerful means for personality development and fostering social  <br><br>
+
+Founded in 2004 in Firozabad under the FS Group of Institutions, the University reflects decades of experience in the 
+education sector. We have developed modern infrastructure, a student-centric learning environment, and a team of dedicated
+ faculty to ensure that our students acquire knowledge, skills, and confidence to excel in their chosen paths.
+<br><br>
+We are committed to nurturing leaders who will make meaningful contributions to society and the nation. FS University
+ strives to provide every student with the guidance and opportunities needed to realize their full potential.
+<br><br>
+— Dr. Dileep Yadav
+Founder & Chancellor, FS University</i></strong></p>
+  </div>
+</section>
+<section class="section-paragraph">
+  <img src="https://fsu.edu.in/wp-content/uploads/2025/03/Dr.-Yogesh-yadav-FS-University.jpg"style="width:500px; height:400px; ">
+  <div class="text">
+    <h1>Pro Chancellor Message </h1>
+    <p><strong><i>
+  Dr. Yogesh Yadav, as the Pro-Chancellor of FS University, considers it both an honor and a responsibility to uphold and advance the visionary ideals and academic values upon which the University was founded. He believes that education is not merely the acquisition of knowledge, but a powerful means of developing character, discipline, ethics, and social <br><br>
+
+Under his guidance, FS University is committed to providing quality education, world-class infrastructure, and a progressive teaching-learning environment that fosters holistic development of students. The goal is to nurture confident, competent, and value-driven individuals who are prepared to meet global challenges and contribute meaningfully to society and the nation. Every student is encouraged to discover their potential, refine their abilities, and achieve lasting success.
+<br><br>
+— Dr. Yogesh Yadav
+Pro-Chancellor
+</i></strong></p>
+  </div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://fsu.edu.in/wp-content/uploads/2025/03/PROF.-Dr.-SANJEEV-BHARDWAJ.jpeg"style="width:500px; height:350px; ">
+  <div class="text">
+    <h1>Vice Chancellor Message </h1>
+    <p><strong><i>
+Welcome to FS University. I am <strong>Dr. Bhardwaj</strong>, your Vice-Chancellor. FS University has always been built on the principles of excellence, innovation, and holistic education. Our mission is not only to provide high-quality knowledge but also to cultivate critical thinking, creativity, and a strong sense of responsibility among our students.<br><br>
+Here, we strive to create an environment where learning goes beyond the classroom. Our modern infrastructure, experienced faculty, and value-driven programs are designed to help you explore your potential, achieve your goals, and prepare for meaningful contributions to society and the nation.<br><br>
+I encourage you to embrace every opportunity, challenge yourself, and grow into a confident, capable, and responsible individual who takes pride in being part of the FS University family.
+
+</i></strong></p>
+  </div>
+</section>
+</section>
+</section>
+
+<section id="courses">
+
+<h1>Courses</h1>
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG6ZQmPk-a6godsUG9TwSbIsFJ9fo8nTmefg&s" alt="">
+  <div class="text">
+    <h2> A.N.M (Auxiliary Nurse Midwife)</h2>
+    <p><strong>ANM (Auxiliary Nurse Midwife) is a diploma-level healthcare course focused on basic nursing, maternal care, and
+       community health services. The program mainly trains students to provide primary medical care, assist in childbirth,
+        care for mothers and newborns, and support vaccination and health awareness programs. ANM professionals play an important
+         role in rural and urban healthcare centers, government hospitals, clinics, and community health programs. After completing
+          the ANM course, candidates can work as auxiliary nurse midwives, healthcare assistants, or community health workers,
+           and they may also continue higher studies in nursing for better career growth.
+         </strong> </p>
+        <a href="admission form.html" class="apply-btn" onclick="applyCourse('A.N.M')">Apply Now</a>
+
+
+    </div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnklQFKe7FG8BqAgjFchh_WQggsu9T2xoTIg&s" alt="">
+  <div class="text">
+    <h2>B.Tech(Bachelor of Technology)</h2>
+  <P><strong>B.Tech (Bachelor of Technology) is a 4-year undergraduate degree program designed to provide in-depth knowledge and practical skills in engineering and technology.
+     The course offers various specializations such as Computer Science, Information Technology, Mechanical, Civil, Electrical, Electronics, Artificial Intelligence, and Data Science.
+      During the B.Tech program, students gain both theoretical understanding and hands-on experience through laboratories, projects, internships, and industrial training.
+     After completing the course, graduates can pursue careers as software engineers, web or app developers, data analysts, network engineers, site engineers, or choose higher
+      studies like M.Tech, MBA, or research programs.
+    </strong></P>
+   <a href="admission form.html" class="apply-btn" onclick="applyCourse('B.tech')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-t5FeMCfvJeC-7PX1g7qYwKz0ARk617grQw&s"alt="">
+  <div class="text">
+    <h2>BBA(Bachelor of Business Administration)</h2>
+    <p><strong>BBA (Bachelor of Business Administration) is a 3-year undergraduate program focused on management,
+         leadership, and business skills. It covers subjects like marketing, finance, human resource management, and
+          entrepreneurship, preparing students for careers in corporate management, sales, banking, and business operations.
+        </strong></p>
+        <a href="admission form.html" class="apply-btn" onclick="applyCourse('BBA')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYcIYf861q8sh2G6284qMJV5sbKOUoYTEExg&s" alt="">
+  <div class="text">
+    <h2>BCA(Bachelor of Computer Applications)</h2>
+  <P><strong>BCA (Bachelor of Computer Applications) is a 3-year undergraduate degree designed for students interested in computer science and information technology.
+     The course includes programming, software development, databases, web technologies, and networking, leading to careers
+      as software developers, programmers, system analysts, or IT professionals.
+    </strong></P>
+     <a href="admission form.html" class="apply-btn" onclick="applyCourse('BCA')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrMC9fRVoYi1-NFkNPrP7BYpC_M1jqnlKhCA&s" alt="">
+  <div class="text">
+    <h2>B.com(Bachelor of Commerce)</h2>
+    <p><strong>B.Com (Bachelor of Commerce) is a 3-year undergraduate program that focuses on commerce,
+         accounting, finance, economics, and business law. It prepares students for careers in accounting,
+          banking, taxation, auditing, finance, and corporate sectors,and also provides a strong foundation for higher studies like M.Com, MBA, CA, or CS.
+        </strong></p>
+        <a href="admission form.html" class="apply-btn" onclick="applyCourse('B.com')">Apply Now</a>
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRedh-TZN87hzGcSobnxUMxFwIX7aXMZN0KuA&s" alt="">
+  <div class="text">
+    <h2>BA(Bachelor of Arts)</h2>
+  <P><strong>BA (Bachelor of Arts) is a 3-year undergraduate degree program that focuses on humanities and social
+     science subjects such as History, Political Science, Sociology, Economics, English, Hindi, and Psychology.
+      This course helps students develop critical thinking, communication skills, and a broad understanding of society, making it suitable for careers
+     in education, civil services, media, social work, and various government or private sector jobs.
+    </strong></P>
+    <a href="admission form.html" class="apply-btn" onclick="applyCourse('BA')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUM01gZEHL3Bz0TULaV5msTBdrhEQYUtsYVA&s" alt="">
+  <div class="text">
+    <h2>BA.LLB(Bachelor of Arts + Bachelor of Laws)</h2>
+    <p><strong>BA LLB (Bachelor of Arts + Bachelor of Laws) is an integrated 5-year professional law program that 
+        combines arts subjects with legal education. The course includes subjects like Political Science,
+         Sociology, Economics, Constitutional Law, Criminal Law, Corporate Law, and Civil Law. After completing
+          BA LLB, graduates can work as advocates, legal advisors, corporate
+         lawyers, legal consultants, or prepare for judiciary and other competitive examinations.
+        </strong></p>
+        <a href="admission form.html" class="apply-btn" onclick="applyCourse('BA.LLB')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQopS1g-Y1xMNufwgm7edSFq0DqL8wdB3YOyQ&s" alt="">
+  <div class="text">
+    <h2>B.sc(Bachelor of Science) </h2>
+  <P><strong>B.Sc (Bachelor of Science) is a 3-year undergraduate degree program focused on scientific and analytical
+     learning in subjects such as Physics, Chemistry, Mathematics, Biology, Computer Science, and Biotechnology.
+      The course builds a strong foundation in science and research skills, leading to career 
+    opportunities in laboratories, education, research institutes, healthcare, and technical fields.
+  </strong></p>
+    <a href="admission form.html" class="apply-btn" onclick="applyCourse('B.sc')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRq9IPHhdkp7E6wAmr0P7Ajhm37-3rjfOrsNQ&s" alt="">
+  <div class="text">
+    <h2>B.sc  Nursing (Bachelor of Science in Nursing)</h2>
+    <p><strong>B.Sc Nursing (Bachelor of Science in Nursing) is a 4-year professional healthcare program that
+         trains students in patient care, medical assistance, community health, and clinical practices. 
+         The course includes theoretical study along with hospital-based practical training. After
+          completion, graduates can work as staff nurses, nursing officers,
+         healthcare supervisors, or pursue higher studies in nursing and healthcare management.
+        </strong></p>
+       <a href="admission form.html" class="apply-btn" onclick="applyCourse('B.sc Nursing')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoeo5puGSeoJRVwxL6q2hqoEKZScUu4aBFfg&s" alt="">
+  <div class="text">
+    <h2>B.sc Ag (B.sc agricultural)</h2>
+  <P><strong>B.Sc Agriculture (B.Sc Ag) is a 4-year undergraduate program focused on agricultural science, 
+    farming techniques, soil science, crop production, horticulture, and agricultural technology.
+     The course prepares students for careers in agribusiness, farming management,
+     agricultural research, government agriculture departments, and rural development sectors.</strong></p>
+    <a href="admission form.html" class="apply-btn" onclick="applyCourse('B.sc Ag')">Apply Now</a>
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUmjFqwSJmRBcJ_r_HilFwOJwIm1q61TCoJg&s" alt="">
+  <div class="text">
+    <h2>B.Pharm(Bachelor of Pharmacy)</h2>
+    <p><strong>B.Pharm (Bachelor of Pharmacy) is a 4-year undergraduate program centered on pharmaceutical
+         sciences, drug development, medicinal chemistry, pharmacology, and pharmacy practice. After 
+         completing B.Pharm, graduates can work as pharmacists, drug inspectors, quality control analysts,
+          medical representatives, or pursue higherstudies and research in the pharmaceutical and healthcare industries.</strong></p>
+       <a href="admission form.html" class="apply-btn" onclick="applyCourse('B.Pharm')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUmjFqwSJmRBcJ_r_HilFwOJwIm1q61TCoJg&s" alt="">
+  <div class="text">
+  <h2>D.Pharm(Diploma in Pharmacy)</h2>
+  <p><strong>D.Pharm (Diploma in Pharmacy) is a 2-year diploma course focused on pharmaceutical education and practical
+     training related to medicines, drug formulation, dispensing, and pharmacy laws. After completing D.Pharm, candidates
+     can register as pharmacists and work in medical stores, hospitals, clinics, or pharmaceutical companies.</strong></p>
+  <a href="admission form.html" class="apply-btn" onclick="applyCourse('D.Pharm')">
+  Apply Now
+</a>
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHHiET07osISTJU8h2569b284P_eOyzy1taA&s" alt="">
+  <div class="text">
+    <h2>GNM(General Nursing and Midwifery)</h2>
+    <p><strong>GNM (General Nursing and Midwifery) is a 3 to 3.5-year diploma-level nursing program that prepares students for
+         clinical nursing, patient care, midwifery, and community health services. GNM graduates can work as staff nurses in
+         government and private hospitals, nursing homes, and healthcare centers, and may also pursue higher studies in nursing.</strong></p>
+       <a href="admission form.html" class="apply-btn" onclick="applyCourse('GNM')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Ay0hRTYl8IgyRkZxhI_CtJo4CyPhvSSzZg&s" alt="">
+  <div class="text">
+  <h2>LLB(Bachelor of Laws)</h2>
+  <P><strong>LLB (Bachelor of Laws) is a 3-year professional law degree pursued after graduation. The course covers important 
+    legal subjects such as Constitutional Law, Criminal Law, Civil Procedure, Corporate Law, and Family Law. After completing
+     LLB, graduates can practice as advocates, legal advisors, corporate lawyers, or prepare for judiciary and other legal services 
+    </strong></P>
+    <a href="admission form.html" class="apply-btn" onclick="applyCourse('LLB')">Apply Now</a>
+
+</div>
+</section>
+
+
+<section class="section-paragraph">
+  <img src="data:image/jpeg;base64,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" alt="">
+  <div class="text">
+    <h2>LAW</h2>
+    <p><strong>Law is a professional field focused on the study of legal systems, rules, and justice. Law courses train students
+         in subjects like Constitutional Law, Criminal Law, Civil Law, Corporate Law, and Human Rights. After completing a law degree, graduates can work as advocates, legal
+         advisors, corporate lawyers, legal consultants, or prepare for judiciary and other competitive legal
+      </strong></p>
+      <a href="#admission" class="apply-btn" onclick="autoSelectCourse('LAW')">Apply Now</a>
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHn2tFL2Vc9RdrjkD1fZ6gUdVGPk1sB3BhUg&s" alt="">
+  <div class="text">
+  <h2>MCA(Master of Computer Applications)</h2>
+  <P><strong>MCA (Master of Computer Applications) is a 2-year postgraduate degree focused on advanced computer applications,
+     software development, data structures, databases, and emerging technologies. MCA graduates can work as software
+      engineers,system analysts, web and app developers, data scientists, or IT consultants in the technology industry.
+    </strong></P>
+    <a href="admission form.html" class="apply-btn" onclick="applyCourse('MCA')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRNJuov-xQO1bDOgdH6qjmW1l2KsLijD1KyA&s" alt="">
+  <div class="text">
+    <h2>MBA(Master of Business Administration)</h2>
+    <p><strong>MBA (Master of Business Administration) is a 2-year postgraduate management program designed to develop leadership, managerial,
+         and decision-making skills. The course offers specializations such as Marketing, Finance, Human Resource Management, Operations,
+          and International Business, preparing students for managerial and executive roles in corporate, banking, consulting, and entrepreneurship sectors.
+        </strong></p>
+       <a href="admission form.html" class="apply-btn" onclick="applyCourse('MBA')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="data:image/jpeg;base64,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" alt="">
+  <div class="text">
+  <h2>M.com(Master of Commerce)</h2>
+  <P><strong>M.Com (Master of Commerce) is a 2-year postgraduate degree program that focuses on advanced studies in commerce, accounting,
+     finance, economics, taxation, and business management. The course is suitable for students aiming for careers in
+     teaching, accounting, finance, banking, corporate sectors, or pursuing professional courses like PhD, CA, or CMA.
+    </strong></P>
+    <a href="admission form.html" class="apply-btn" onclick="applyCourse('M.com')">Apply Now</a>
+
+</div>
+</section>
+
+<section class="section-paragraph">
+  <img src="data:image/jpeg;base64,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" alt="">
+  <div class="text">
+    <h2>M.tech(Master of Technology)</h2>
+    <p><strong>M.Tech (Master of Technology) is a 2-year postgraduate engineering program designed to provide advanced
+         technical knowledge and research skills in specialized engineering fields such as Computer Science, Mechanical,
+          Civil, Electrical, Electronics, and emerging technologies. M.Tech graduates can work in research
+         and development, higher education, core engineering industries, or pursue doctoral studies.
+        </strong></p>
+        <a href="admission form.html" class="apply-btn" onclick="applyCourse('M.tech')">Apply Now</a>
+
+    </div>
+</section>
+
+<section class="section-paragraph">
+  <img src="data:image/jpeg;base64,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" alt="">
+  <div class="text">
+  <h2>Polytechnic</h2>
+  <P><strong>Polytechnic is a diploma-level technical education program, generally of 3 years duration, focused on practical
+     and skill-based training in engineering and technology fields like Mechanical, Civil, Electrical, Electronics,
+      and Computer Engineering. Polytechnic courses prepare students for 
+    technical jobs, industrial work, and also provide opportunities for lateral entry into B.Tech programs.
+  </strong></P>
+    <a href="admission form.html" class="apply-btn" onclick="applyCourse('Polytechnic')">Apply Now</a>
+
+</div>
+</section>
+</section>
+
+<section class="contact-section">
+
+  <div class="contact-box">
+    <i class="fa-solid fa-phone"></i>
+    <h3>Contact</h3>
+    <p><strong><a href="tel:+917900889820">+91-7900889820</a></strong></p>
+    <p><strong><a href="tel:+919917286666">+91-9917286666</a></strong></p>
+  </div>
+
+  <div class="contact-box">
+    <i class="fa-solid fa-location-dot"></i>
+    <h3>Address</h3>
+    <p><strong>
+      NH 19, Agra Road,<br>
+      Near Balaji Mandir,<br>
+      Shikohabad, Firozabad,<br>
+      Uttar Pradesh – 283135
+    </strong></p>
+  </div>
+
+  <div class="contact-box">
+    <i class="fa-solid fa-envelope"></i>
+    <h3>Email</h3>
+    <p><strong><a href="mailto:info@fsu.edu.in">info@fsu.edu.in</a></strong></p>
+    <p><strong><a href="mailto:admission@fsu.edu.in">admission@fsu.edu.in</a></strong></p>
+  </div>
+
+</section>
+
+<hr>
+
+<footer>© 2025 FS University | All Rights Reserved</footer>
+
+<script>
+/* ☰ MENU TOGGLE */
+function toggleMenu(){
+  document.getElementById("navMenu").classList.toggle("show");
+}
+
+/* CLICK ANYWHERE → HIDE MENU */
+document.addEventListener("click",function(e){
+  const menu=document.getElementById("navMenu");
+  const btn=document.querySelector(".menu-btn");
+  if(menu.classList.contains("show")){
+    if(!menu.contains(e.target) && !btn.contains(e.target)){
+      menu.classList.remove("show");
+    }
+  }
+});
+
+/* HERO SLIDER */
+let slides=document.querySelectorAll(".hero-slide");
+let i=0;
+setInterval(()=>{
+  slides[i].classList.remove("active");
+  i=(i+1)%slides.length;
+  slides[i].classList.add("active");
+},4000);
+// ✅ LOGIN CHECK → PROFILE LINK SHOW
+if(localStorage.getItem("loggedIn") === "yes"){
+  document.getElementById("profileLink").style.display = "inline-block";
+}
+
+
+
+function applyCourse(courseName){
+  localStorage.setItem("selectedCourse", courseName);
+  window.location.href = "admission form.html"; 
+}
+
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Online Admission Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{font-family:Arial;background:#f4f6f8;}
+.form-box{
+  max-width:520px;
+  background:#fff;
+  padding:20px;
+  margin:40px auto;
+  border-radius:8px;
+   box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+input,select,button{
+  width:100%;
+  box-sizing:border-box;
+  padding:10px;
+  margin-top:10px;}
+.emi-option label{
+  margin-right:15px;
+  cursor:pointer}
+#emiCard{
+  background:#eef6ff;
+  border:1px solid #004aad;
+  padding:10px;
+  margin-top:10px;}
+button{
+  background:#004aad;
+  color:#fff;
+  border:none;
+  font-size:16px;
+  cursor:pointer;}
+.err{
+  color:red;font-size:12px}
+label{
+  display:block;
+  margin-top:10px}
+#paymentPage{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;}
+#paymentBox{
+  background:#fff;
+  padding:20px;
+  width:320px;
+  border-radius:8px;}
+.payBtn{
+  background:#0a8d48;
+  margin-top:10px;}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+<div class="form-box">
+<h2>Online Admission Form</h2>
+
+<input id="sname" placeholder="Student Name" oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
+<div id="err_sname" class="err"></div>
+<input id="father" placeholder="Father Name" oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
+<div id="err_father" class="err"></div>
+<input id="mother" placeholder="Mother Name" oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')">
+<div id="err_mother" class="err"></div>
+<input type="email" id="email" placeholder="Email ID">
+<div id="err_email" class="err"></div>
+<input type="password" id="password" placeholder="Create Password">
+<div id="err_password" class="err"></div>
+<input id="phone" placeholder="Phone Number">
+<div id="err_phone" class="err"></div>
+<select id="course" onchange="onCourseChange()">
+<option value="">Select Course</option>
+<option>A.N.M</option><option>B.tech</option><option>BBA</option>
+<option>BCA</option><option>B.com</option><option>BA.LLB</option>
+<option>BA</option><option>B.sc</option><option>B.sc Nursing</option>
+<option>B.sc Ag</option><option>B.Pharm</option><option>D.Pharm</option>
+<option>GNM</option><option>LLB</option><option>LAW</option>
+<option>MBA</option><option>MCA</option><option>M.com</option>
+<option>M.tech</option><option>Polytechnic</option>
+</select>
+
+<select id="branch" style="display:none"><option value="">Select Branch</option></select>
+<div id="err_branch" class="err"></div>
+
+<select id="studyType" style="display:none" onchange="loadYearSemester()">
+<option value="">Select Year / Semester</option>
+<option value="year">Year Wise</option>
+<option value="semester">Semester Wise</option>
+</select>
+<div id="err_studyType" class="err"></div>
+
+<select id="yearBox" style="display:none" onchange="updateDocuments()"></select>
+<div id="err_yearBox" class="err"></div>
+
+<select id="semesterBox" style="display:none" onchange="updateDocuments()"></select>
+<div id="err_semesterBox" class="err"></div>
+
+<div id="documents"></div>
+<div id="err_docs" class="err"></div>
+
+<div class="emi-option">
+<label><input type="radio" name="payment" value="full" checked onchange="updateFees()"> Full</label>
+<label><input type="radio" name="payment" value="emi" onchange="updateFees()"> EMI</label>
+</div>
+
+<div id="emiCountBox" style="display:none">
+<label><b>Select EMI Count (1 Year)</b></label>
+<select id="emiCount"></select>
+</div>
+
+<div id="feeDisplay"><b>Fee: ₹0</b></div>
+<div id="emiCard"></div>
+
+<div style="display:none">
+<input id="upiInput"><div id="err_upi" class="err"></div>
+</div>
+
+<button onclick="submitForm()">Submit & Pay</button>
+</div>
+
+<div id="successPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5)">
+<div style="background:#fff;max-width:350px;margin:120px auto;padding:20px;border-radius:8px;text-align:center">
+<h2 style="color:green">✔ Admission Successful</h2>
+<p>Aapka admission successfully ho gaya hai.</p>
+<button onclick="goToWebsite()">OK</button>
+</div>
+</div>
+
+<div id="paymentPage">
+<div id="paymentBox">
+<h3>Online Payment</h3>
+<label>Enter UPI ID</label>
+<input id="upiPay" placeholder="example@upi">
+<div class="err" id="payErr"></div>
+<p><b>OR Pay Using</b></p>
+<button class="payBtn" onclick="completePayment()">Paytm</button>
+<button class="payBtn" onclick="completePayment()">GPay</button>
+<button class="payBtn" onclick="completePayment()">PhonePe</button>
+</div>
+</div>
+
+<script>
+let paymentDone=false;
+
+const courseFees={
+"A.N.M":180000,"B.tech":150000,"BBA":30000,"BCA":40000,"B.com":35000,
+"BA.LLB":55000,"BA":15000,"B.sc":25000,"B.sc Nursing":150000,
+"B.sc Ag":45000,"B.Pharm":85000,"D.Pharm":115000,"GNM":95000,
+"LLB":25000,"LAW":37000,"MBA":60000,"MCA":55000,"M.com":35000,
+"M.tech":200000,"Polytechnic":34000
+};
+const syllabusMap = {
+"A.N.M":"syllabus/anm.pdf","B.tech":"syllabus/btech.pdf","BBA":"syllabus/bba.pdf",
+"BCA":"syllabus/bca.pdf","B.com":"syllabus/bcom.pdf","BA":"syllabus/ba.pdf",
+"B.sc":"syllabus/bsc.pdf"
+};
+const technicalBranches = {
+"B.tech":["CSE","ME","CE","EE","AI","DS"],
+"M.tech":["CSE","ME","CE","EE","AI"],
+"Polytechnic":["CSE","ME","CE","EE"],
+};
+
+function onCourseChange(){
+studyType.style.display="block";
+updateFees();
+const branchBox = document.getElementById("branch");
+branchBox.innerHTML = "<option value=''>Select Branch</option>";
+branchBox.style.display = "none";
+if(technicalBranches[course.value]){
+branchBox.style.display="block";
+technicalBranches[course.value].forEach(b=>{branchBox.innerHTML += `<option value="${b}">${b}</option>`;});
+}
+}
+
+function loadYearSemester(){
+yearBox.style.display="none";semesterBox.style.display="none";yearBox.innerHTML="";semesterBox.innerHTML="";documents.innerHTML="";
+if(studyType.value==="year"){yearBox.style.display="block";yearBox.innerHTML="<option value=''>Select Year</option>";for(let i=1;i<=5;i++) yearBox.innerHTML+=`<option value="${i}">${i} Year</option>`;}
+if(studyType.value==="semester"){semesterBox.style.display="block";semesterBox.innerHTML="<option value=''>Select Semester</option>";for(let i=1;i<=10;i++) semesterBox.innerHTML+=`<option value="${i}">${i} Semester</option>`;}
+}
+
+function updateDocuments(){
+documents.innerHTML="";
+const year = yearBox.value; const sem = semesterBox.value;
+let docs=[{label:"Student Photo",type:"image/*"},{label:"Aadhaar Card",type:".pdf,.jpg,.png"},
+{label:"10th Marksheet",type:".pdf,.jpg,.png"},{label:"12th Marksheet",type:".pdf,.jpg,.png"}];
+if(year){const y=parseInt(year);for(let i=1;i<y;i++){docs.push({label:`Year ${i} Marksheet`,type:".pdf,.jpg,.png"});}}
+if(sem){const s=parseInt(sem);for(let i=1;i<s;i++){docs.push({label:`Semester ${i} Marksheet`,type:".pdf,.jpg,.png"});}}
+docs.forEach(d=>{const div=document.createElement("div");const label=document.createElement("label");label.innerHTML=`<b>${d.label}</b>`;const input=document.createElement("input");input.type="file";input.accept=d.type;input.dataset.required="true";div.appendChild(label);div.appendChild(input);const errDiv=document.createElement("div");errDiv.className="err";div.appendChild(errDiv);documents.appendChild(div);});
+}
+
+function updateFees(){
+const c=course.value;
+const p=document.querySelector('input[name="payment"]:checked').value;
+emiCard.innerHTML="";
+if(!c){ feeDisplay.innerText="Fee: ₹0"; emiCountBox.style.display="none"; return; }
+const fee=courseFees[c];
+if(p==="full"){feeDisplay.innerText=`Fee: ₹${fee}`; emiCountBox.style.display="none"; return;}
+emiCountBox.style.display="block"; emiCount.innerHTML="";
+if(fee>100000){[2,3,4].forEach(n=>emiCount.innerHTML+=`<option value="${n}">${n} EMI</option>`);}
+else{emiCount.innerHTML=`<option value="2">2 EMI</option>`;}
+calculateEMI();
+}
+
+function calculateEMI(){
+const fee = courseFees[course.value];const count = parseInt(emiCount.value);if(!count) return;
+const perEmi = Math.floor(fee / count);
+let html = `<b>EMI Breakdown (1 Year)</b><br>`; let remaining = fee;
+for(let i=1;i<=count;i++){let amt=(i===count)?remaining:perEmi;remaining-=amt;html+=`${i} EMI : ₹${amt}<br>`;}
+emiCard.innerHTML = html;
+}
+
+function submitForm(){
+document.querySelectorAll(".err").forEach(e=>e.innerText=""); let valid=true;
+const sname=document.getElementById("sname").value.trim();
+const father=document.getElementById("father").value.trim();
+const mother=document.getElementById("mother").value.trim();
+const email=document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
+const phone=document.getElementById("phone").value.trim();
+const courseVal=document.getElementById("course").value;
+const branchVal = document.getElementById("branch").value;
+const study=studyType.value; const year=yearBox.value; const sem=semesterBox.value;
+
+if(technicalBranches[courseVal] && !branchVal){document.getElementById("err_branch").innerText="Select Branch"; valid=false;}
+const namePattern = /^[A-Za-z ]+$/;
+
+if(!sname){
+  err_sname.innerText = "Student Name required";
+  valid = false;
+}
+else if(!namePattern.test(sname)){
+  err_sname.innerText = "Only letters allowed (no numbers or symbols)";
+  valid = false;
+}
+
+if(!father){
+  err_father.innerText = "Father Name required";
+  valid = false;
+}
+else if(!namePattern.test(father)){
+  err_father.innerText = "Only letters allowed";
+  valid = false;
+}
+
+if(!mother){
+  err_mother.innerText = "Mother Name required";
+  valid = false;
+}
+else if(!namePattern.test(mother)){
+  err_mother.innerText = "Only letters allowed";
+  valid = false;
+}
+
+
+
+const emailPattern=/^\S+@\S+\.\S+$/;
+if(!email){document.getElementById("err_email").innerText="Email required"; valid=false;}
+else if(!emailPattern.test(email)){document.getElementById("err_email").innerText="Invalid Email"; valid=false;}
+
+const phonePattern=/^\d{10}$/;
+if(!phone){document.getElementById("err_phone").innerText="Phone required"; valid=false;}
+else if(!phonePattern.test(phone)){document.getElementById("err_phone").innerText="Invalid Phone"; valid=false;}
+
+const paymentMode = document.querySelector('input[name="payment"]:checked').value;
+const isNext = localStorage.getItem("isNextAdmission");
+
+if(!isNext){
+if(!password){document.getElementById("err_password").innerText="Password required"; valid=false;}
+else if(password.length < 6){document.getElementById("err_password").innerText="Minimum 6 characters"; valid=false;}
+}
+
+if(!courseVal){document.getElementById("err_course").innerText="Select Course"; valid=false;}
+if(!study){document.getElementById("err_studyType").innerText="Select Year/Semester type"; valid=false;}
+if(study==="year" && !year){document.getElementById("err_yearBox").innerText="Select Year"; valid=false;}
+if(study==="semester" && !sem){document.getElementById("err_semesterBox").innerText="Select Semester"; valid=false;}
+
+let docInputs=document.querySelectorAll("#documents input[type=file]");
+docInputs.forEach(input=>{const errDiv=input.nextElementSibling;if(input.dataset.required && !input.files.length){errDiv.innerText="Upload required"; valid=false;}});
+if(!valid) return;
+if(!paymentDone){document.getElementById("paymentPage").style.display="flex"; return;}
+
+let students = JSON.parse(localStorage.getItem("students")) || [];
+const oldStudent = JSON.parse(localStorage.getItem("reApplyStudent"));
+let admissionNo;
+if(isNext === "yes" && oldStudent){admissionNo = oldStudent.admissionNo;} else{admissionNo = "FSU"+Date.now();}
+
+// EMAIL UNIQUE CHECK
+if(!isNext && students.some(s => s.email===email)){alert("Email already registered"); return;}
+
+let paymentHistory = [];
+const totalFee = courseFees[courseVal];
+if(paymentMode === "full"){
+  paymentHistory.push({
+    type: "FULL",
+    status: "PAID",
+    amount: totalFee,
+    date: new Date().toLocaleDateString()
+  });
+}
+
+if(paymentMode === "emi"){
+
+  const totalEmi = parseInt(emiCount.value);
+  const perEmi = Math.ceil(totalFee / totalEmi);
+
+  // 🔴 CASE: 2 EMI → DONO EK SAATH PAID
+  if(totalEmi === 2){
+
+    for(let i = 1; i <= totalEmi; i++){
+      paymentHistory.push({
+        type: "EMI",
+      emiNo: i,
+      amount: perEmi,
+      status: i === 1 ? "PAID" : "DUE",
+      date: i === 1 ? new Date().toLocaleDateString() : "-"
+      });
+    }
+
+  } else {
+
+    // 🟢 CASE: 3 / 4 EMI → sirf first EMI paid
+    for(let i = 1; i <= totalEmi; i++){
+      paymentHistory.push({
+        type: "EMI",
+        status: i === 1 ? "PAID" : "DUE",
+        amount: perEmi,
+        emiNo: i,
+        date: i === 1 ? new Date().toLocaleDateString() : "-"
+      });
+    }
+
+  }
+ 
+
+
+}
+
+const existingIndex = students.findIndex(s=>s.email===email);
+
+if(existingIndex !== -1){
+
+  if(isNext === "yes"){
+    // 🔒 NEXT ADMISSION → sirf year / semester update
+    students[existingIndex] = {
+      ...students[existingIndex],
+      studyType: study,
+      year: year,
+      semester: sem,
+      paymentMode: paymentMode,
+      paymentHistory: paymentHistory,
+      syllabusPDF: syllabusMap[courseVal] || students[existingIndex].syllabusPDF
+    };
+  } else {
+    // 🟢 NORMAL ADMISSION → sab kuch update
+    students[existingIndex] = {
+      ...students[existingIndex],
+      name: sname,
+      father: father,
+      mother: mother,
+      phone: phone,
+      course: courseVal,
+      branch: branchVal,
+      studyType: study,
+      year: year,
+      semester: sem,
+      paymentMode: paymentMode,
+      paymentHistory: paymentHistory,
+      syllabusPDF: syllabusMap[courseVal] || students[existingIndex].syllabusPDF
+    };
+  }
+
+  localStorage.setItem(
+    "currentStudent",
+    JSON.stringify(students[existingIndex])
+  );
+
+} else {
+  // 🆕 FIRST TIME ADMISSION
+  students.push({
+    admissionNo: admissionNo,
+    name: sname,
+    father: father,
+    mother: mother,
+    email: email,
+    password: password,
+    phone: phone,
+    course: courseVal,
+    branch: branchVal,
+    studyType: study,
+    year: year,
+    semester: sem,
+    paymentMode: paymentMode,
+    paymentHistory: paymentHistory,
+    resultPDF: "",
+    syllabusPDF: syllabusMap[courseVal] || ""
+  });
+
+  localStorage.setItem(
+    "currentStudent",
+    JSON.stringify(students[students.length - 1])
+  );
+}
+
+
+// SAVE OLD ADMISSIONS
+if(isNext==="yes"){
+let oldAdmissions = JSON.parse(localStorage.getItem("oldAdmissions"))||[];
+if(study==="year"){
+  const completedYear=parseInt(year)-1;
+  if(completedYear>=1){
+  oldAdmissions.push({  
+  name:sname,
+  father:father,
+  mother:mother,
+  email:email,
+  phone:phone,
+  course:courseVal,
+  branch:branchVal,
+  studyType:"year",
+  year:completedYear,
+  paymentMode:paymentMode,
+  paymentHistory:paymentHistory,
+  date:new Date().toLocaleDateString()});}}
+else{
+  const completedSem=parseInt(sem)-1;
+  if(completedSem>=1){
+  oldAdmissions.push({
+  name:sname,
+  father:father,
+  mother:mother,
+  email:email,
+  phone:phone,
+  course:courseVal,
+  branch:branchVal,
+  studyType:"semester",
+  semesterFrom:completedSem,
+  semesterTo:completedSem,
+  paymentMode:paymentMode,
+  paymentHistory:paymentHistory,
+  date:new Date().toLocaleDateString()});}}
+localStorage.setItem("oldAdmissions",JSON.stringify(oldAdmissions));
+localStorage.removeItem("isNextAdmission");
+}
+
+localStorage.setItem("students",JSON.stringify(students));
+generatePDF();
+alert("Form submitted successfully");
+}
+
+function completePayment(){
+const upi=document.getElementById("upiPay").value.trim();
+if(!upi){document.getElementById("payErr").innerText="Enter UPI ID"; return;}
+document.getElementById("upiInput").value=upi;
+paymentDone=true;
+document.getElementById("paymentPage").style.display="none";
+setTimeout(()=>{alert("Payment Successful ✔"); document.getElementById("successPopup").style.display="block";},2000);
+submitForm();
+}
+
+
+function generatePDF(){
+  const currentStudent = JSON.parse(localStorage.getItem("currentStudent"));
+const admissionNo = currentStudent?.admissionNo || "N/A";
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+
+    // HEADER
+    pdf.setFillColor(0,74,173); 
+    pdf.rect(0,0,210,30,"F");
+    pdf.setTextColor(255,255,255); 
+    pdf.setFontSize(18);
+    pdf.text("FS UNIVERSITY - PAYMENT RECEIPT",105,20,{align:"center"});
+
+    // STUDENT INFO
+    pdf.setTextColor(0,0,0);
+    pdf.setFontSize(12);
+    let y=40;
+    const receiptNo="FSU"+Date.now();
+    const date=new Date().toLocaleDateString();
+    pdf.text(`Receipt No: ${receiptNo}`,10,y);
+    pdf.text(`Date: ${date}`,150,y);
+    y+=10;
+
+    const sname=document.getElementById("sname").value; 
+    const father=document.getElementById("father").value;
+    const mother = document.getElementById("mother").value; 
+    const phone=document.getElementById("phone").value; 
+    const email=document.getElementById("email").value;
+
+    pdf.setFontSize(14); pdf.text("Student Details",10,y);
+    pdf.line(10,y+1,200,y+1); y+=8;
+    pdf.setFontSize(12);
+    pdf.text(`Admission No: ${admissionNo}`,10,y);y+=7;
+    pdf.text(`Name: ${sname}`,10,y);
+    pdf.text(`Father Name: ${father}`,10,y+7);
+    pdf.text(`Mother Name: ${mother}`, 10, y + 14);
+    pdf.text(`Phone: ${phone}`,10,y+21); 
+    pdf.text(`Email: ${email}`,10,y+28); y+=35;
+
+    
+   // COURSE INFO
+pdf.setFontSize(14); pdf.text("Course Details",10,y);
+pdf.line(10,y+1,200,y+1); y+=8;
+pdf.setFontSize(12);
+const courseVal = document.getElementById("course").value;
+pdf.text(`Course: ${courseVal}`,10,y); y+=7;
+
+
+// ✅ Branch दिखाने का logic (PDF)
+const branch = document.getElementById("branch")?.value || "";
+const technicalCourses = ["B.tech", "M.tech", "Polytechnic"];
+
+if(technicalCourses.includes(courseVal) && branch){
+    pdf.text(`Branch: ${branch}`,10,y);
+    y += 7;
+}
+
+const study = document.getElementById("studyType").value;
+const studyLabel = study==="year"?document.getElementById("yearBox").value+" Year":document.getElementById("semesterBox").value+" Semester";
+pdf.text(`Study Mode: ${studyLabel}`,10,y); y+=10;
+
+    // PAYMENT INFO
+    pdf.setFontSize(14); pdf.text("Payment Details",10,y); pdf.line(10,y+1,200,y+1); y+=8;
+    const paymentMode=document.querySelector('input[name="payment"]:checked').value;
+    const totalFee=courseFees[courseVal];
+
+    if(paymentMode==="emi"){
+        const totalEmi=parseInt(emiCount.value);
+        const perEmi=Math.ceil(totalFee/totalEmi); 
+
+        // ✅ EMI PDF → FIRST EMI PAID
+        const paidEmi = 1;
+        const dueEmi = totalEmi - 1;
+        const paidAmount = perEmi;
+        const dueAmount = totalFee - perEmi;
+
+        pdf.setFontSize(12);
+        pdf.text("Paid EMI",10,y); y+=7;
+        pdf.text(`• EMI Paid: ${paidEmi}`,15,y); y+=7;
+        pdf.text(`• Amount Paid: ₹${paidAmount}`,15,y); y+=10;
+        pdf.text("Due EMI",10,y); y+=7;
+        pdf.text(`• Total EMI Selected: ${totalEmi}`,15,y); y+=7;
+        pdf.text(`• Remaining EMI: ${dueEmi}`,15,y); y+=7;
+        pdf.text(`• Remaining Amount: ₹${dueAmount}`,15,y); y+=10;
+    }else{
+        pdf.setFontSize(12); 
+        pdf.text(`Payment Mode: FULL`,10,y); y+=7;
+        pdf.text(`Amount Paid: ₹${totalFee}`,10,y); y+=10;
+    }
+
+    pdf.setTextColor(0,128,0); pdf.setFontSize(14);
+    pdf.text("PAYMENT STATUS : SUCCESS",105,y,{align:"center"}); y+=10;
+    pdf.setTextColor(0,0,0); pdf.setFontSize(12);
+    pdf.text(`UPI ID: ${document.getElementById("upiInput").value}`,10,y);
+
+    pdf.setFontSize(10);
+    pdf.text("This is a system generated receipt. No signature required.",105,290,{align:"center"});
+
+    // ✅ PDF SAVE (Download)
+    pdf.save(`FSU_Receipt_${sname}.pdf`);
+}
+
+function goToWebsite(){window.location.href="frontend.html";}
+
+document.addEventListener("DOMContentLoaded",function(){
+
+  const savedCourse = localStorage.getItem("selectedCourse");
+  const savedBranch = localStorage.getItem("selectedBranch");
+
+  if(savedCourse){
+    const courseSelect = document.getElementById("course");
+    courseSelect.value = savedCourse;
+    onCourseChange(); // branch dropdown load
+
+    // 🟢 Branch auto select (technical courses)
+    if(savedBranch){
+      setTimeout(() => {
+        const branchSelect = document.getElementById("branch");
+        if(branchSelect){
+          branchSelect.value = savedBranch;
+        }
+      }, 100);
+    }
+
+    localStorage.removeItem("selectedCourse");
+    localStorage.removeItem("selectedBranch");
+  }
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const old = JSON.parse(localStorage.getItem("reApplyStudent"));
+
+  if (old) {
+
+    // 🔒 NEXT ADMISSION FLAG
+    localStorage.setItem("isNextAdmission", "yes");
+
+    // ===== BASIC DETAILS (LOCKED) =====
+    sname.value = old.name || "";
+    father.value = old.father || "";
+    mother.value = old.mother || "";
+    email.value = old.email || "";
+    phone.value = old.phone || "";
+    password.value = old.password || "";
+
+    sname.readOnly = true;
+    father.readOnly = true;
+    mother.readOnly = true;
+    email.readOnly = true;
+    phone.readOnly = true;
+    password.readOnly = true;
+
+    // ===== COURSE & BRANCH (LOCKED) =====
+    course.value = old.course;
+    course.disabled = true;
+    onCourseChange();
+
+    if (old.branch) {
+      branch.style.display = "block";
+      branch.value = old.branch;
+      branch.disabled = true;
+    }
+
+    // ===== STUDY TYPE (LOCKED) =====
+    studyType.value = old.studyType;
+    studyType.disabled = true;
+    loadYearSemester();
+
+    // ===== YEAR / SEMESTER AUTO + LOCK =====
+    if (old.studyType === "year") {
+      yearBox.value = parseInt(old.year) + 1;
+      yearBox.disabled = true;       // 🔒 LOCK
+    } else {
+      semesterBox.value = parseInt(old.semester) + 1;
+      semesterBox.disabled = true;   // 🔒 LOCK
+    }
+
+    // ===== DOCUMENTS LOAD =====
+    updateDocuments();
+
+    // CLEANUP
+    localStorage.removeItem("reApplyStudent");
+  }
+});
+
+
+emiCount.onchange=calculateEMI;
+</script>
+</body>
+</html>
